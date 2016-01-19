@@ -1,0 +1,465 @@
+<!-- Copyright (c) 2015 Google Inc. All rights reserved. -->
+<!-- Author: Marco Zanghi' - marcozanghi[AT]live[DOT]it from google-map-marker code -->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-apis/google-maps-api.html">
+
+<!--
+The `google-map-circle` element represents a map circle. It is used as a
+child of `google-map`.
+
+<b>Example</b>:
+
+    <google-map latitude="37.77493" longitude="-122.41942">
+      <google-map-circle radius="100" latitude="37.779" longitude="-122.3892"
+          ></google-map-circle>
+    </google-map>
+
+-->
+
+<dom-module id="google-map-circle">
+  <style>
+    :host {
+      display: none;
+    }
+  </style>
+  <template><content></content></template>
+</dom-module>
+
+<script>
+(function() {
+
+  function setupDragHandler_() {
+    if (this.draggable) {
+      this.dragHandler_ = google.maps.event.addListener(
+          this.circle, 'dragend', onDragEnd_.bind(this));
+    } else {
+      google.maps.event.removeListener(this.dragHandler_);
+      this.dragHandler_ = null;
+    }
+  }
+
+  function onDragEnd_(e, details, sender) {
+    this.latitude = e.latLng.lat();
+    this.longitude = e.latLng.lng();
+  }
+
+  Polymer({
+
+    is: 'google-map-circle',
+
+    /**
+     * Fired when the circle icon was clicked. Requires the clickEvents attribute to be true.
+     * @param {google.maps.MouseEvent} event The mouse event.
+     * @event google-map-circle-click
+     */
+
+    /**
+     * Fired when the circle icon was double clicked. Requires the clickEvents attribute to be true.
+     * @param {google.maps.MouseEvent} event The mouse event.
+     * @event google-map-circle-dblclick
+     */
+
+    /**
+     * Fired for a mousedown on the circle. Requires the mouseEvents attribute to be true.
+     * @event google-map-circle-mousedown
+     * @param {google.maps.MouseEvent} event The mouse event.
+     */
+
+    /**
+     * Fired when the DOM `mousemove` event is fired on the circle. Requires the mouseEvents
+     * attribute to be true.
+     * @event google-map-circle-mousemove
+     * @param {google.maps.MouseEvent} event The mouse event.
+     */
+
+    /**
+     * Fired when the mouse leaves the area of the circle icon. Requires the mouseEvents attribute to be
+     * true.
+     * @event google-map-circle-mouseout
+     * @param {google.maps.MouseEvent} event The mouse event.
+     */
+
+    /**
+     * Fired when the mouse enters the area of the circle icon. Requires the mouseEvents attribute to be
+     * true.
+     * @event google-map-circle-mouseover
+     * @param {google.maps.MouseEvent} event The mouse event.
+     */
+
+    /**
+     * Fired for a mouseup on the circle. Requires the mouseEvents attribute to be true.
+     *
+     * @event google-map-circle-mouseup
+     * @param {google.maps.MouseEvent} event The mouse event.
+     */
+
+    /**
+     * Fired for a rightclick on the circle. Requires the clickEvents attribute to be true.
+     * @event google-map-circle-rightclick
+     * @param {google.maps.MouseEvent} event The mouse event.
+     */
+
+    /**
+     * Fired when an infowindow is opened.
+     * @event google-map-circle-open
+     */
+
+    /**
+     * Fired when the close button of the infowindow is pressed.
+     * @event google-map-circle-close
+     */
+
+    properties: {
+      /**
+       * A Google Maps circle object.
+       * @type google.maps.circle
+       */
+      circle: {
+        type: Object,
+        notify: true
+      },
+
+      /**
+       * The Google map object.
+       * @type google.maps.Map
+       */
+      map: {
+        type: Object,
+        observer: '_mapChanged'
+      },
+
+      /**
+       * A Google Map Infowindow object.
+       */
+      info: {
+        type: Object,
+        value: null
+      },
+
+      /**
+       * When true, circle *click events are automatically registered.
+       */
+      clickEvents: {
+        type: Boolean,
+        value: false,
+        observer: '_clickEventsChanged'
+      },
+
+      /**
+       * Image URL for the circle icon.
+       * @type string|google.maps.Icon|google.maps.Symbol
+       */
+      icon: {
+        type: Object,
+        value: null,
+        observer: '_iconChanged'
+      },
+
+      /**
+       * When true, circle mouse* events are automatically registered.
+       */
+      mouseEvents: {
+        type: Boolean,
+        value: false,
+        observer: '_mouseEventsChanged'
+      },
+
+      /**
+       * Z-index for the circle icon.
+       */
+      zIndex: {
+        type: Number,
+        value: 0,
+        observer: '_zIndexChanged'
+      },
+
+      /**
+       * The circle's longitude coordinate of the center.
+       */
+      longitude: {
+        type: Number,
+        value: null,
+        notify: true
+      },
+
+      /**
+       * The circle's latitude coordinate of the center.
+       */
+      latitude: {
+        type: Number,
+        value: null,
+        notify: true
+      },
+
+      /**
+       * The circle's radius.
+       */
+      radius: {
+        type: Number,
+        value: 100,
+        notify: true
+      },
+
+      /**
+       * The circle's stroke color.
+       */
+      strokeColor: {
+        type: String,
+        value: '#FF0000',
+        notify:true
+      },
+      /**
+       * The circle's stroke opacity.
+       */
+      strokeOpacity:{
+        type: Number,
+       value: 0.8,
+       notify: true
+     },
+      /**
+       * The circle's stroke wight.
+       */
+      strokeWeight:{
+        type: Number,
+       value: 2,
+       notify: true
+     },
+      /**
+       * The circle's stroke fill color.
+       */
+      fillColor:{
+        type: String,
+       value: '#FF0000',
+       notify: true
+     },
+      /**
+       * The circle's stroke fill opacity.
+       */
+      fillOpacity:{
+        type: Number,
+       value: 0.35,
+       notify: true
+     },
+      
+      /**
+       * A animation for the circle. "DROP" or "BOUNCE". See
+       * https://developers.google.com/maps/documentation/javascript/examples/circle-animations.
+       */
+      animation: {
+        type: String,
+        value: null,
+        observer: '_animationChanged'
+      },
+
+      /**
+       * Specifies whether the InfoWindow is open or not
+       */
+      open: {
+        type: Boolean,
+        value: false,
+        observer: '_openChanged'
+      }
+    },
+
+    observers: [
+      '_updatePosition(latitude, longitude)'
+    ],
+
+    detached: function() {
+      if (this.circle) {
+        google.maps.event.clearInstanceListeners(this.circle);
+        this._listeners = {};
+        this.circle.setMap(null);
+      }
+      if (this._contentObserver)
+        this._contentObserver.disconnect();
+    },
+
+    attached: function() {
+      // If element is added back to DOM, put it back on the map.
+      if (this.circle) {
+        this.circle.setMap(this.map);
+      }
+    },
+
+    _updatePosition: function() {
+      if (this.circle && this.latitude != null && this.longitude != null) {
+        this.circle.setPosition({
+          lat: parseFloat(this.latitude),
+          lng: parseFloat(this.longitude)
+        });
+      }
+    },
+
+    _clickEventsChanged: function() {
+      if (this.map) {
+        if (this.clickEvents) {
+          this._forwardEvent('click');
+          this._forwardEvent('dblclick');
+          this._forwardEvent('rightclick');
+        } else {
+          this._clearListener('click');
+          this._clearListener('dblclick');
+          this._clearListener('rightclick');
+        }
+      }
+    },
+
+    _mouseEventsChanged: function() {
+      if (this.map) {
+        if (this.mouseEvents) {
+          this._forwardEvent('mousedown');
+          this._forwardEvent('mousemove');
+          this._forwardEvent('mouseout');
+          this._forwardEvent('mouseover');
+          this._forwardEvent('mouseup');
+        } else {
+          this._clearListener('mousedown');
+          this._clearListener('mousemove');
+          this._clearListener('mouseout');
+          this._clearListener('mouseover');
+          this._clearListener('mouseup');
+        }
+      }
+    },
+
+    _animationChanged: function() {
+      if (this.circle) {
+        this.circle.setAnimation(google.maps.Animation[this.animation]);
+      }
+    },
+
+    _iconChanged: function() {
+      if (this.circle) {
+        this.circle.setIcon(this.icon);
+      }
+    },
+
+    _zIndexChanged: function() {
+      if (this.circle) {
+        this.circle.setZIndex(this.zIndex);
+      }
+    },
+
+    _mapChanged: function() {
+      // circle will be rebuilt, so disconnect existing one from old map and listeners.
+      if (this.circle) {
+        this.circle.setMap(null);
+        google.maps.event.clearInstanceListeners(this.circle);
+      }
+
+      if (this.map && this.map instanceof google.maps.Map) {
+        this._mapReady();
+      }
+    },
+
+    _contentChanged: function() {
+      if (this._contentObserver)
+        this._contentObserver.disconnect();
+      // Watch for future updates.
+      this._contentObserver = new MutationObserver( this._contentChanged.bind(this));
+      this._contentObserver.observe( this, {
+        childList: true,
+        subtree: true
+      });
+
+      var content = this.innerHTML.trim();
+      if (content) {
+        if (!this.info) {
+          // Create a new infowindow
+          this.info = new google.maps.InfoWindow();
+          this.openInfoHandler_ = google.maps.event.addListener(this.circle, 'click', function() {
+            this.open = true;
+          }.bind(this));
+
+          this.closeInfoHandler_ = google.maps.event.addListener(this.info, 'closeclick', function() {
+            this.open = false;
+          }.bind(this));
+        }
+        this.info.setContent(content);
+      } else {
+        if (this.info) {
+          // Destroy the existing infowindow.  It doesn't make sense to have an empty one.
+          google.maps.event.removeListener(this.openInfoHandler_);
+          google.maps.event.removeListener(this.closeInfoHandler_);
+          this.info = null;
+        }
+      }
+    },
+
+    _openChanged: function() {
+      if (this.info) {
+        if (this.open) {
+          this.info.open(this.map, this.circle);
+          this.fire('google-map-circle-open');
+        } else {
+          this.info.close();
+          this.fire('google-map-circle-close');
+        }
+      }
+    },
+
+    _mapReady: function() {
+      var meter = 100;
+      var conversion = meter;
+      console.log(parseInt(conversion));
+      this._listeners = {};
+      this.circle = new google.maps.Circle({
+      map: this.map,
+      strokeColor: this.strokeColor,
+      strokeOpacity: parseFloat(this.strokeOpacity),
+      strokeWeight: parseFloat(this.strokeWeight),
+      fillColor: this.fillColor,
+      fillOpacity: parseFloat(this.fillOpacity),
+        center: {
+          lat: parseFloat(this.latitude),
+          lng: parseFloat(this.longitude)
+        },
+        radius: parseFloat(this.radius),
+       
+      });
+      this._contentChanged();
+      this._clickEventsChanged();
+      this._contentChanged();
+      this._mouseEventsChanged();
+      this._openChanged();
+      setupDragHandler_.bind(this)();
+    },
+
+    _clearListener: function(name) {
+      if (this._listeners[name]) {
+        google.maps.event.removeListener(this._listeners[name]);
+        this._listeners[name] = null;
+      }
+    },
+
+    _forwardEvent: function(name) {
+      this._listeners[name] = google.maps.event.addListener(this.circle, name, function(event) {
+        this.fire('google-map-circle-' + name, event);
+      }.bind(this));
+    },
+
+    attributeChanged: function(attrName, oldVal, newVal) {
+      if (!this.circle) {
+        return;
+      }
+
+      // Cannot use *Changed watchers for native properties.
+      switch (attrName) {
+        case 'hidden':
+          this.circle.setVisible(!this.hidden);
+          break;
+        case 'draggable':
+          this.circle.setDraggable(this.draggable);
+          setupDragHandler_.bind(this)();
+          break;
+        case 'title':
+          this.circle.setTitle(this.title);
+          break;
+      }
+    }
+  });
+
+})();
+</script>
