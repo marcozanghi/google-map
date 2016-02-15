@@ -23,7 +23,8 @@ child of `google-map`.
       display: none;
     }
   </style>
-  <template><content></content></template>
+  <template>
+  <content></content></template>
 </dom-module>
 
 <script>
@@ -43,6 +44,7 @@ child of `google-map`.
     this.latitude = e.latLng.lat();
     this.longitude = e.latLng.lng();
   }
+
 
   Polymer({
 
@@ -164,6 +166,7 @@ child of `google-map`.
         value: false,
         observer: '_mouseEventsChanged'
       },
+   
 
       /**
        * Z-index for the rectangle icon.
@@ -172,6 +175,18 @@ child of `google-map`.
         type: Number,
         value: 0,
         observer: '_zIndexChanged'
+      },
+
+      bounds:{
+        type:Object,        
+      notify:true
+      },
+
+
+      editable:{
+        type:Boolean,        
+        value:false,
+        notify:true
       },
 
       /**
@@ -269,7 +284,8 @@ child of `google-map`.
     },
 
     observers: [
-      '_updatePosition(latitude, longitude)'
+      '_setBounds(north,south,east,west)'
+
     ],
 
     detached: function() {
@@ -289,8 +305,8 @@ child of `google-map`.
       }
     },
 
-    _updatePosition: function() {
-      if (this.rectangle && this.latitude != null && this.longitude != null) {
+    _setBounds: function() {
+      if (this.rectangle && this.north != null && this.south != null && this.east != null && this.west != null) {
         this.rectangle.setBounds({bounds: {
       north: parseFloat(this.north),
       south: parseFloat(this.south),
@@ -413,6 +429,10 @@ child of `google-map`.
       var conversion = meter;
       console.log(parseInt(conversion));
       this._listeners = {};
+      this.bounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(this.south, this.west),
+        new google.maps.LatLng(this.north,this.east)
+    )
       this.rectangle = new google.maps.Rectangle({
       map: this.map,
       strokeColor: this.strokeColor,
@@ -420,14 +440,11 @@ child of `google-map`.
       strokeWeight: parseFloat(this.strokeWeight),
       fillColor: this.fillColor,
       fillOpacity: parseFloat(this.fillOpacity),
-         bounds: {
-      north: parseFloat(this.north),
-      south: parseFloat(this.south),
-      east: parseFloat(this.east),
-      west: parseFloat(this.west)
-    },
+         bounds: this.bounds,
+     editable: this.editable,
     draggable:this.draggable,
      visible: !this.hidden,
+    
        
       });
       this._contentChanged();
