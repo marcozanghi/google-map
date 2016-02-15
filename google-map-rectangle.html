@@ -291,10 +291,12 @@ child of `google-map`.
 
     _updatePosition: function() {
       if (this.rectangle && this.latitude != null && this.longitude != null) {
-        this.rectangle.setPosition({
-          lat: parseFloat(this.latitude),
-          lng: parseFloat(this.longitude)
-        });
+        this.rectangle.setBounds({bounds: {
+      north: parseFloat(this.north),
+      south: parseFloat(this.south),
+      east: parseFloat(this.east),
+      west: parseFloat(this.west)
+    },});
       }
     },
 
@@ -424,6 +426,8 @@ child of `google-map`.
       east: parseFloat(this.east),
       west: parseFloat(this.west)
     },
+    draggable:this.draggable,
+     visible: !this.hidden,
        
       });
       this._contentChanged();
