@@ -1,6 +1,5 @@
 <!-- Copyright (c) 2015 Google Inc. All rights reserved. -->
 <!-- Author: Marco Zanghi' - marcozanghi[AT]live[DOT]it from google-map-marker code -->
-<!-- TODO - clean not useful code --->
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../google-apis/google-maps-api.html">
@@ -286,7 +285,7 @@ child of `google-map`.
 
     _updatePosition: function() {
       if (this.circle && this.latitude != null && this.longitude != null) {
-        this.circle.setPosition({
+        this.circle.setCenter({
           lat: parseFloat(this.latitude),
           lng: parseFloat(this.longitude)
         });
@@ -418,6 +417,8 @@ child of `google-map`.
           lng: parseFloat(this.longitude)
         },
         radius: parseFloat(this.radius),
+        draggable: this.draggable,
+         visible: !this.hidden,
        
       });
       this._contentChanged();
