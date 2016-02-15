@@ -120,6 +120,12 @@ child of `google-map`.
         notify: true
       },
 
+      editable: {
+        type: Boolean,
+        value:false,
+        notify: true
+      },
+
       /**
        * The Google map object.
        * @type google.maps.Map
@@ -419,6 +425,7 @@ child of `google-map`.
         radius: parseFloat(this.radius),
         draggable: this.draggable,
          visible: !this.hidden,
+         editable: this.editable,
        
       });
       this._contentChanged();
